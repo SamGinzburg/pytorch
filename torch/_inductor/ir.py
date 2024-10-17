@@ -5335,7 +5335,6 @@ class UserDefinedTritonKernel(ExternKernel):
                     arg for idx, arg in enumerate(raw_args)
                     if (not arg is None) or (arg is None and idx in constexpr_args_set)
                 ]
-
         wrapper.generate_user_defined_triton_kernel(
             new_name, raw_args, self.grid, configs, triton_meta, constexpr_indices
         )

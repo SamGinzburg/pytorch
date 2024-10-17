@@ -486,10 +486,11 @@ class CachingAutotuner(KernelInterface):
         We also don't want to modify self.fn.
 
         We know that we removed something from the signature if:
-            1. It's in the fn.arg_names but not the compile_meta signature
+            1. It's in compile_meta["constants"]
             2. It isn't a constant we already know about
                 Note: The value of interest has already been added to compile_meta['constants'],
                     so we use self.fn.constexprs instead.
+            3. It isn't in the compile_meta signature
         """
         self.arg_names = self.fn.arg_names
         removed_from_sig = set(compile_meta["constants"].keys())
@@ -499,6 +500,7 @@ class CachingAutotuner(KernelInterface):
             if i in self.fn.constexprs
         }
         removed_from_sig = removed_from_sig.difference(known_constants)
+        removed_from_sig = removed_from_sig.difference(set(compile_meta["signature"].keys()))
 
         call_args = [
             arg
@@ -507,6 +509,7 @@ class CachingAutotuner(KernelInterface):
         ]
 
         def_args = [name for name in self.arg_names if name not in cfg.kwargs and not name in removed_from_sig]
+
         binary_shared = (
             binary.shared if hasattr(binary, "shared") else binary.metadata.shared
         )
