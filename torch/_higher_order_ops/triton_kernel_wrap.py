@@ -1115,8 +1115,6 @@ class TritonHOPifier:
             constexprs = variable.kernel.fn.constexprs
 
 
-        #constexprs.append(0)
-
         for idx, arg_name in enumerate(variable.kernel.arg_names):
             if idx in constexprs:
                 if arg_name in combined_args_raw:
