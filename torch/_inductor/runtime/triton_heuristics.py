@@ -467,6 +467,7 @@ class CachingAutotuner(KernelInterface):
             device_interface.synchronize(device_interface.current_device())
 
             try:
+                breakpoint()
                 binary = triton.compile(*compile_args, **compile_kwargs)
             except Exception:
                 log.exception(
@@ -691,6 +692,7 @@ class CachingAutotuner(KernelInterface):
             cloned_args, cloned_kwargs = self.maybe_clone_args(
                 cpu_copies, *args, **kwargs
             )
+            breakpoint()
             launcher(
                 *cloned_args,
                 **cloned_kwargs,
