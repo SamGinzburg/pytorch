@@ -5315,12 +5315,11 @@ class UserDefinedTritonKernel(ExternKernel):
         # So, let's recalculate constexpr indices wrt to raw_args.
         constexpr_indices = []
         for idx, kwarg in enumerate(self.ordered_kwargs_for_cpp_kernel):
-            if kernel.arg_names.index(kwarg) in kernel.constexprs: #or kwarg == 'in_ptr0':
+            if kernel.arg_names.index(kwarg) in kernel.constexprs:
                 constexpr_indices.append(idx)
 
         # Call to kernel
         self.codegen_comment(wrapper)
-        breakpoint()
 
         raw_args = list(filter(lambda x: not x is None, raw_args))
 
@@ -5363,11 +5362,6 @@ class UserDefinedTritonKernel(ExternKernel):
         self.grid = grid
 
         kernel, configs = self.get_kernel_and_configs()
-
-        #kernel.arg_names = list(filter(lambda x: x != 'in_ptr0', kernel.arg_names))
-        #del kernel_args['in_ptr0']
-
-        print (configs[0].kwargs, kernel_args, kernel.constexprs)
 
         # If we are autotuning, not all arguments will be passed
         self.ordered_kwargs_for_cpp_kernel = [

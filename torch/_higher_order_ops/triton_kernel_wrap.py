@@ -150,8 +150,6 @@ def generate_ttir(kernel, kwargs):
 
     assert isinstance(kernel, JITFunction)
 
-    breakpoint()
-
     if len(kwargs) != len(kernel.arg_names):
         raise ValueError("Incorrect number of arguments passed to kernel")
 
@@ -169,8 +167,6 @@ def generate_ttir(kernel, kwargs):
         else:
             ordered_args[name] = a
 
-
-
     ordered_tensor_names = [
         name for name, arg in ordered_args.items() if isinstance(arg, Tensor)
     ]
@@ -179,19 +175,12 @@ def generate_ttir(kernel, kwargs):
         name: arg for name, arg in ordered_args.items() if not isinstance(arg, Tensor)
     }
 
-    print (kernel.constexprs)
-    kernel.constexprs.append(0)
-
     # Build kernel signature -- doesn't include constexpr arguments.
     signature = {
         name: kernel._type_of(kernel._key_of(arg))
         for i, (name, arg) in enumerate(ordered_args.items())
         if i not in kernel.constexprs
     }
-
-    #del signature['in_ptr0']
-
-    breakpoint()
 
     context = triton._C.libtriton.ir.context()
     target = triton.runtime.driver.active.get_current_target()
@@ -510,8 +499,6 @@ def identify_mutated_tensors(kernel, kwargs):
     ttir_module = None
     functions = None
     try:
-        breakpoint()
-        print (kernel, kwargs)
         ttir_module, ordered_tensor_names = generate_ttir(kernel, kwargs)
 
         # extract functions from TTIR using MLIR bindings exposed by Triton code
@@ -1121,12 +1108,14 @@ class TritonHOPifier:
                 self.raise_unsupported("Grid can have at most rank 3")
 
         assert len(grids) != 0
-        breakpoint()
         if isinstance(variable.kernel, JITFunction):
             constexprs = variable.kernel.constexprs
         else:
             assert isinstance(variable.kernel, Autotuner)
             constexprs = variable.kernel.fn.constexprs
+
+
+        #constexprs.append(0)
 
         for idx, arg_name in enumerate(variable.kernel.arg_names):
             if idx in constexprs:
@@ -1144,7 +1133,6 @@ class TritonHOPifier:
                     combined_args_raw[arg_name] = variable.specialize_symbolic(
                         combined_args_raw[arg_name]
                     )
-
         return self.call_HOP(variable, grids, combined_args_raw, tx)
 
 
